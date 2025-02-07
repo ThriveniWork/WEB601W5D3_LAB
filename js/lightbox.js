@@ -1,47 +1,59 @@
 document.addEventListener("DOMContentLoaded", function () {
-    document.querySelector(".lightbox-toggle img").addEventListener("click", function () {
-        const backdrop = document.querySelector(".backdrop");
-        const box = document.querySelector(".box");
+    var images = document.querySelectorAll(".lightbox-toggle img");
+    var photoContainer = document.querySelector("#photo");
 
-        // Show the backdrop
-        backdrop.style.display = "block";
-        backdrop.style.opacity = "0.8";
+    images.forEach(image => {
+        image.addEventListener("click", function () {
+            // Remove any existing zoomed image
+            var existingZoom = document.querySelector(".zoomed-image-container");
+            if (existingZoom) {
+                existingZoom.remove();
+            }
 
-        // Show the lightbox container
-        box.style.display = "block";
+            // Create a container for the zoomed image
+            var zoomContainer = document.createElement("div");
+            zoomContainer.classList.add("zoomed-image-container");
 
-        // Create an image element and set its attributes
-        const img = document.createElement("img");
-        img.src = this.src;
-        img.alt = this.alt;
-        img.style.maxWidth = "100%";
-        img.style.height = "auto";
-        img.style.borderRadius = "5px";
+            // Create the zoomed image
+            var zoomedImg = document.createElement("img");
+            zoomedImg.src = this.src;
+            zoomedImg.alt = this.alt;
+            zoomedImg.classList.add("zoomed-image");
 
-        // Remove any existing content in the lightbox
-        while (box.firstChild) {
-            box.removeChild(box.firstChild);
-        }
+            // Create the close button
+            var closeButton = document.createElement("div");
+            closeButton.classList.add("close");
+            closeButton.innerHTML = "&times;";
 
-        // Add close button
-        const closeButton = document.createElement("div");
-        closeButton.classList.add("close");
-        closeButton.innerHTML = "&times;";
+            // Append image and close button to the zoom container
+            zoomContainer.appendChild(zoomedImg);
+            zoomContainer.appendChild(closeButton);
+            document.body.appendChild(zoomContainer);
 
-        // Append the close button and image
-        box.appendChild(closeButton);
-        box.appendChild(img);
+            // Get the clicked image's position
+            var rect = this.getBoundingClientRect();
+            zoomContainer.style.top = `${rect.top + window.scrollY}px`;
+            zoomContainer.style.left = `${rect.left + window.scrollX}px`;
+            zoomContainer.style.width = `${rect.width}px`;
+            zoomContainer.style.height = `${rect.height}px`;
 
-        // Event listener to close the lightbox
-        closeButton.addEventListener("click", function () {
-            backdrop.style.display = "none";
-            box.style.display = "none";
-        });
+           
+            void zoomContainer.offsetWidth;
 
-        // Close lightbox when clicking on backdrop
-        backdrop.addEventListener("click", function () {
-            backdrop.style.display = "none";
-            box.style.display = "none";
+            // Apply zoom effect
+            zoomContainer.style.transform = "scale(2)";
+            zoomContainer.style.zIndex = "100";
+
+            // Function to close the zoomed image
+            function closeZoom() {
+                zoomContainer.style.transform = "scale(1)";
+                zoomContainer.style.opacity = "0";
+
+            }
+
+            // Attach event listeners to close the zoom
+            closeButton.addEventListener("click", closeZoom);
+            zoomedImg.addEventListener("click", closeZoom);
         });
     });
 });
